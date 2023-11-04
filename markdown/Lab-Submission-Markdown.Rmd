@@ -1,30 +1,89 @@
-# Consider a library as the location where packages are stored.
-# Execute the following command to list all the libraries available in your
-# computer:
-.libPaths()
+---
+title: "Business Intelligence Lab Submission Markdown"
+author: "Lumin"
+date: "04/11/23"
+output:
+  github_document:
+    toc: yes
+    toc_depth: 4
+    fig_width: 6
+    fig_height: 4
+    df_print: default
+always_allow_html: true
+editor_options:
+  chunk_output_type: console
+---
 
-# One of the libraries should be a folder inside the project if you are using
-# renv
 
-# Then execute the following command to see which packages are available in
-# each library:
-lapply(.libPaths(), list.files)
+# Student Details
+
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **Student ID Numbers and Names of Group Members** | 
+|                                                   |                                                                                                      |
+|                                                   | 1.  112827 - A - Mungai Kenneth                                                                      |
+|                                                   |                                                                                                      |
+|                                                   | 2.  123324 - B - Kelly Noella Sota                                                                     |
+|                                                   |                                                                                                      |
+|                                                   | 3.  134265 - A - Emmanuel Kiptoo                                                                   |
+|                                                   |                                                                                                      |
+|                                                   |                                                                               |
+|                                                   |                                                                                                      |
+|                                                   |                                                                               |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **GitHub Classroom Group Name**                   |    Lumin                                                                                                  |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **Course Code**                                   | BBT4206                                                                                              |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **Course Name**                                   | Business Intelligence II                                                                             |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **Program**                                       | Bachelor of Business Information Technology                                                          |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+| **Semester Duration**                             | 21^st^ August 2023 to 28^th^ November 2023                                                           |
++---------------------------------------------------+------------------------------------------------------------------------------------------------------+
+
+# Setup Chunk
+
+**Note:** the following "*KnitR*" options have been set as the defaults:\
+`knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE, collapse = FALSE, tidy.opts = list(width.cutoff = 80), tidy = TRUE)`.
+
+More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-cookbook/chunk-options.html> and here <https://yihui.org/knitr/options/>.
+
+```{r setup, include=FALSE}
+if (require("formatR")) {
+  require("formatR")
+} else {
+  install.packages("formatR", dependencies = TRUE,
+                   repos = "https://cloud.r-project.org")
+}
+library(formatR)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE,
+                      collapse = FALSE, tidy = TRUE)
+```
+
+**Note:** the following "*R Markdown*" options have been set as the defaults:
+
+> output:\
+> \
+> github_document:\
+> toc: yes\
+> toc_depth: 4\
+> fig_width: 6\
+> fig_height: 4\
+> df_print: default\
+> \
+> editor_options:\
+> chunk_output_type: console
 
 
-
+# 1: Install and Load Required Packages
+In this step, we ensure that the necessary R packages are installed and loaded. Packages are collections of R functions, data, and compiled code that extend the functionality of R. The install.packages() function is used to install packages, and library() is used to load them.
+```{r setup-chunk-one}
 if (require("languageserver")) {
   require("languageserver")
 } else {
   install.packages("languageserver", dependencies = TRUE,
                    repos = "https://cloud.r-project.org")
 }
-
-# Introduction ----
-# Clustering is a type of unsupervised machine learning technique that aims to
-# group similar data points together into clusters or segments based on certain
-# characteristics or similarities, without the need for predefined labels or
-# target outcomes. In clustering, the goal is to discover hidden patterns or
-# structures in data and to create natural groupings of data points.
 
 # STEP 1. Install and Load the Required Packages ----
 ## readr ----
@@ -99,10 +158,11 @@ if (require("dplyr")) {
                    repos = "https://cloud.r-project.org")
 }
 
-# STEP 2. Load the Dataset ----
+```
 
-
-# Load the necessary library for reading CSV files (if not already loaded)
+# 2. Load the Dataset
+This code snippet is used to load the dataset "Air Traffic Passenger Statistics".
+```{r step-two-chunk}
 library(readr)
 
 # Load the Air Traffic Passenger dataset
@@ -129,12 +189,18 @@ Air_Traffic_Passenger_Statistics <- read_csv("data/Air_Traffic_Passenger_Statist
 
 
 
+
 str(Air_Traffic_Passenger_Statistics)
 dim(Air_Traffic_Passenger_Statistics)
 head(Air_Traffic_Passenger_Statistics)
 summary(Air_Traffic_Passenger_Statistics)
 
-# STEP 3. Check for Missing Data and Address it ----
+
+```
+
+# 3.  Check for Missing Data and Address it
+This code checks if there are any missing values and try to correct it by removing them from the datasets. This code will showcase two options to deal with missing values. 
+```{r step-three-chunk}
 # Are there missing values in the dataset?
 any_na(Air_Traffic_Passenger_Statistics)
 
@@ -185,11 +251,11 @@ dim(AirTraffic_removed_vars)
 any_na(AirTraffic_removed_vars)
 
 
-# STEP 4. Perform EDA and Feature Selection ----
-## Compute the correlations between variables ----
-# We identify the correlated variables because it is these correlated variables
-# that can then be used to identify the clusters.
+```
 
+# 4.Perform EDA and Feature Selection 
+This code will compute the correlations between variables. Numeric variables are the ones that are going to be used. The goal is to find correlated variables so that they can be used to identify clusters.
+```{r step-four-chunk}
 # Create a correlation matrix
 # Option 1: Basic Table
 cor(AirTraffic_removed_obs[, c(1,12,14,15)]) %>%
@@ -271,8 +337,12 @@ AirTraffic_vars <-
 #AirTraffic_vars <-
   #AirTraffic_removed_obs_std[, c("Month",
                                        #"GEO_Region")]
+```
 
-# STEP 5. Create the clusters using the K-Means Clustering Algorithm ----
+
+# 5. Create the clusters using the K-Means Clustering Algorithm
+This code first explores the optimal number of clusters by iteratively running K-Means with different numbers of clusters and then uses a scree plot to identify the elbow point. Finally, it selects 5 clusters as the optimal number and performs K-Means clustering with 5 clusters on the dataset.
+```{r step-five-chunk}
 # We start with a random guess of the number of clusters we need
 set.seed(7)
 kmeans_cluster <- kmeans(AirTraffic_vars, centers = 4, nstart = 20)
@@ -324,7 +394,12 @@ set.seed(7)
 # Build model with k clusters: kmeans_cluster
 kmeans_cluster <- kmeans(AirTraffic_vars, centers = k, nstart = 20)
 
-# STEP 6. Add the cluster number as a label for each observation ----
+```
+
+
+# 6. Add the cluster number as a label for each observation
+This code adds cluster labels to a dataset that has undergone K-Means clustering. It then creates a scatter plot to visualize the data points, with each point color-coded according to its cluster assignment.
+```{r step-six-chunk}
 AirTraffic_removed_obs$cluster_id <- factor(kmeans_cluster$cluster)
 
 ## View the results by plotting scatter plots with the labelled cluster ----
@@ -334,4 +409,4 @@ ggplot(AirTraffic_removed_obs, aes(Passenger_Count, Month,
   xlab("Number of Passengers") +
   ylab("Month")
 
-
+```
